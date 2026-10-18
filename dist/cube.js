@@ -7,10 +7,11 @@ try {
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.setClearColor(0xf6f5ee,0);
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure=1.1;
+  renderer.toneMappingExposure=1.05;
   const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(34,350/320,.1,50);
-  camera.position.set(0,.15,9.1);
+  const viewHeight=5.05;
+  const camera=new THREE.OrthographicCamera(-viewHeight*350/320/2,viewHeight*350/320/2,viewHeight/2,-viewHeight/2,.1,50);
+  camera.position.set(5,3.6,6.5);
   camera.lookAt(0,-.12,0);
   const room=new RoomEnvironment();
   const pmrem=new THREE.PMREMGenerator(renderer);
@@ -26,14 +27,14 @@ try {
   const {route,branch,frameState}=await import('./cube-motion.js');
   const sculpture=new THREE.Group();scene.add(sculpture);
   const rodGeometry=new THREE.CylinderGeometry(1,1,1,10);
-  const beadGeometry=new THREE.SphereGeometry(.024,12,8);
-  const milestoneGeometry=new RoundedBoxGeometry(.18,.18,.18,3,.018);
-  const frameMaterial=new THREE.MeshStandardMaterial({color:0x48624e,metalness:.3,roughness:.4,transparent:true,opacity:.9});
-  const gridMaterial=new THREE.MeshStandardMaterial({color:0x698264,metalness:.15,roughness:.5,transparent:true,opacity:.48});
-  const nodeMaterial=new THREE.MeshStandardMaterial({color:0x7a8c6c,metalness:.18,roughness:.4});
-  const routeMaterial=new THREE.MeshPhysicalMaterial({color:0xa7803a,metalness:.55,roughness:.26,clearcoat:.6,transparent:true});
+  const beadGeometry=new THREE.SphereGeometry(.023,16,12);
+  const milestoneGeometry=new RoundedBoxGeometry(.175,.175,.175,5,.024);
+  const frameMaterial=new THREE.MeshStandardMaterial({color:0x506d58,metalness:.42,roughness:.32,transparent:true,opacity:.82});
+  const gridMaterial=new THREE.MeshStandardMaterial({color:0x84977a,metalness:.2,roughness:.45,transparent:true,opacity:.24});
+  const nodeMaterial=new THREE.MeshStandardMaterial({color:0x607c5a,metalness:.35,roughness:.3});
+  const routeMaterial=new THREE.MeshPhysicalMaterial({color:0x9f7934,metalness:.4,roughness:.28,clearcoat:.8,emissive:0x705023,emissiveIntensity:.08,transparent:true});
   const branchMaterial=new THREE.MeshStandardMaterial({color:0x9d8d65,metalness:.2,roughness:.5,transparent:true,opacity:.5});
-  const milestoneMaterial=new THREE.MeshPhysicalMaterial({color:0x345d41,metalness:.3,roughness:.28,clearcoat:.7,transparent:true});
+  const milestoneMaterial=new THREE.MeshPhysicalMaterial({color:0x477456,metalness:.15,roughness:.3,clearcoat:.65,clearcoatRoughness:.2,transparent:true});
   const tipMaterial=new THREE.MeshPhysicalMaterial({color:0xc2ac68,metalness:.5,roughness:.2,clearcoat:.8,emissive:0x69511d,emissiveIntensity:.1,transparent:true});
   const lattice=[],beads=[],segments=[],failedSegments=[],milestones=[];
   const up=new THREE.Vector3(0,1,0);
@@ -50,15 +51,23 @@ try {
     const others=[0,1,2].filter(v=>v!==axis),a=[0,0,0],b=[0,0,0];
     a[axis]=0;b[axis]=3;a[others[0]]=b[others[0]]=i;a[others[1]]=b[others[1]]=j;
     const outside=(i===0||i===3)&&(j===0||j===3);
-    lattice.push({a,b,mesh:rod(outside?frameMaterial:gridMaterial,outside?.016:.007)});
+    lattice.push({a,b,mesh:rod(outside?frameMaterial:gridMaterial,outside?.014:.0045)});
   }
   for(let x=0;x<4;x++)for(let y=0;y<4;y++)for(let z=0;z<4;z++){
+    if(![x,y,z].every(v=>v===0||v===3))continue;
     const mesh=new THREE.Mesh(beadGeometry,nodeMaterial);sculpture.add(mesh);beads.push({index:[x,y,z],mesh});
   }
-  for(let i=0;i<route.length-1;i++)segments.push(rod(routeMaterial,.032));
-  for(let i=0;i<branch.length-1;i++)failedSegments.push(rod(branchMaterial,.016));
+  for(let i=0;i<route.length-1;i++)segments.push(rod(routeMaterial,.023));
+  for(let i=0;i<branch.length-1;i++)failedSegments.push(rod(branchMaterial,.012));
   route.forEach(index=>{const mesh=new THREE.Mesh(milestoneGeometry,milestoneMaterial);sculpture.add(mesh);milestones.push({index,mesh});});
-  const tip=new THREE.Mesh(new THREE.SphereGeometry(.065,20,12),tipMaterial);sculpture.add(tip);
+  const tip=new THREE.Mesh(new THREE.SphereGeometry(.045,24,16),tipMaterial);sculpture.add(tip);
+  const glowCanvas=document.createElement('canvas');glowCanvas.width=64;glowCanvas.height=64;
+  const glowCtx=glowCanvas.getContext('2d');
+  const glowGradient=glowCtx.createRadialGradient(32,32,0,32,32,32);
+  glowGradient.addColorStop(0,'rgba(255,234,175,.9)');glowGradient.addColorStop(.15,'rgba(235,199,107,.5)');glowGradient.addColorStop(1,'rgba(235,199,107,0)');
+  glowCtx.fillStyle=glowGradient;glowCtx.fillRect(0,0,64,64);
+  const glint=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(glowCanvas),transparent:true,opacity:.55,depthWrite:false}));
+  glint.scale.set(.28,.28,1);sculpture.add(glint);
   function updateStructure(time,still){
     const state=frameState(time,still),spread=state.spread;
     for(const part of lattice)positionRod(part.mesh,point(part.a,spread),point(part.b,spread));
@@ -71,24 +80,30 @@ try {
       });
     }
     trace(segments,route,state.progress);trace(failedSegments,branch,state.branch);
-    milestones.forEach(({mesh,index},i)=>{mesh.position.copy(point(index,spread));mesh.visible=i<=state.progress;});
+    milestones.forEach(({mesh,index},i)=>{
+      mesh.position.copy(point(index,spread));
+      const reveal=Math.max(0,Math.min(1,(state.progress-i+.12)/.3));
+      const scale=reveal*reveal*(3-2*reveal);
+      mesh.visible=scale>.001;mesh.scale.setScalar(Math.max(.001,scale));
+    });
     const current=Math.min(route.length-2,Math.floor(state.progress));
     tip.position.copy(point(route[current],spread)).lerp(point(route[current+1],spread),state.progress-current);
+    glint.position.copy(tip.position);glint.material.opacity=.55*state.opacity;
     routeMaterial.opacity=state.opacity;milestoneMaterial.opacity=state.opacity;tipMaterial.opacity=state.opacity;
     branchMaterial.opacity=.55*state.opacity;
     canvas.dataset.cycle=state.branch>.1?'reconsidering':state.progress<8.9?'exploring':'connecting';
   }
 
-  // A soft contact shadow gives the glass volume a little weight on the page.
+  // A diffuse shadow anchors the light wire structure.
   const shadowCanvas=document.createElement('canvas');shadowCanvas.width=128;shadowCanvas.height=128;
   const shadowCtx=shadowCanvas.getContext('2d');
   const gradient=shadowCtx.createRadialGradient(64,64,4,64,64,64);
-  gradient.addColorStop(0,'rgba(41,63,37,.22)');gradient.addColorStop(.45,'rgba(41,63,37,.09)');gradient.addColorStop(1,'rgba(41,63,37,0)');
+  gradient.addColorStop(0,'rgba(41,63,37,.13)');gradient.addColorStop(.45,'rgba(41,63,37,.05)');gradient.addColorStop(1,'rgba(41,63,37,0)');
   shadowCtx.fillStyle=gradient;shadowCtx.fillRect(0,0,128,128);
-  const shadow=new THREE.Mesh(new THREE.PlaneGeometry(4.1,.85),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false}));
-  shadow.position.set(0,-2.45,-.4);scene.add(shadow);
+  const shadow=new THREE.Mesh(new THREE.PlaneGeometry(4.5,.72),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false}));
+  shadow.position.set(0,-1.91,-.3);scene.add(shadow);
 
-  const initial={x:.4,y:-.72,z:-.025};
+  const initial={x:0,y:0,z:0};
   let rotation={...initial},pointer=null,frame=0,lastTime=0,elapsed=2.7,visible=true;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   let paused=reduced.matches;
@@ -97,7 +112,7 @@ try {
     frame=0;
     const dt=lastTime?Math.min((time-lastTime)/1000,.05):0;lastTime=time;
     if(!paused&&!pointer)elapsed+=dt;
-    sculpture.rotation.set(rotation.x,rotation.y+(reduced.matches?0:Math.sin(elapsed*.27)*.15),rotation.z);
+    sculpture.rotation.set(rotation.x,rotation.y+(reduced.matches?0:Math.sin(elapsed*.22)*.09),rotation.z);
     updateStructure(elapsed,reduced.matches);
     sculpture.position.y=-.03;
     renderer.render(scene,camera);
@@ -113,7 +128,7 @@ try {
   }
   function resize(){
     const width=canvas.clientWidth,height=width*320/350;
-    renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();render();
+    renderer.setSize(width,height,false);camera.left=-viewHeight*width/height/2;camera.right=viewHeight*width/height/2;camera.updateProjectionMatrix();render();
   }
   toggle.addEventListener('click',()=>setPaused(!paused));
   canvas.addEventListener('pointerdown',event=>{

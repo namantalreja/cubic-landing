@@ -15,7 +15,7 @@ h1{font-family:var(--serif);font-size:42px;line-height:1.09;font-weight:400;lett
 p{margin:0;font-size:15px;line-height:1.85;color:var(--text)}
 .research p+p{margin-top:18px}
 .cube-figure{min-width:0;margin:0}
-.cube-wrap{position:relative}
+.cube-wrap{position:relative;isolation:isolate}.cube-wrap:before{content:"";position:absolute;inset:5% -8% 3%;background:radial-gradient(ellipse at 50% 52%,rgba(216,228,201,.24),transparent 66%);z-index:-1;pointer-events:none}
 canvas{display:block;width:100%;height:auto;aspect-ratio:350/320;cursor:grab;touch-action:pan-y;border-radius:4px}
 canvas.dragging{cursor:grabbing;touch-action:none}
 .motion-toggle{position:absolute;right:10px;bottom:0;display:grid;place-items:center;background:transparent;border:0;color:#8b967e;font-size:14px;width:28px;height:28px;cursor:pointer}
