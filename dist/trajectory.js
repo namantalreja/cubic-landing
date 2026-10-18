@@ -59,7 +59,7 @@ function stroke(points, style, width, dash) {
 }
 
 function draw() {
-  const still = reduced.matches, state = frameState(elapsed, still), spread = state.spread;
+  const still = reduced.matches, state = frameState(elapsed, still), spread = 1;
   const yaw = rotation.y + (still ? 0 : Math.sin(elapsed * 0.22) * 0.1);
   const ink = color('--ink'), faint = color('--faint'), rule = color('--rule'), accent = color('--accent');
   ctx.clearRect(0, 0, size, size);
