@@ -102,7 +102,7 @@ figcaption{display:flex;justify-content:space-between;gap:20px;padding:14px var(
   .header-contact{margin:0;padding:6px 11px 7px;font-size:15px}
   .masthead{padding:64px var(--pad) 40px}
   .wordmark{font-size:clamp(60px,15.5vw,120px);max-width:none;padding-right:.04em}
-  .section:before{display:none}
+  .section:before,.section:after{display:none}
   .num{padding-top:18px}
   .body{padding:calc(var(--section) * .7) var(--pad) var(--section)}
   .section p{font-size:17px}
