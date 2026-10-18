@@ -1,16 +1,15 @@
 # Cubic
 
-A compact single-page website for Cubic. Static HTML and CSS, with an interactive three-dimensional research cube rendered in Canvas. No dependencies or build step.
+A compact single-page site. Static HTML/CSS and an interactive rotating 3D brand cube. No dependencies or build step.
 
-Run `npm run dev`, then open http://localhost:4173. Python 3 is required for this development server. Any static host can serve `dist/` directly.
+Run `npm run dev`, then open http://localhost:4173. Python 3 is required for the preview server. Any static host can serve `dist/`.
 
-- `dist/index.html`: company description, founders, and contact links.
+- `dist/index.html`: company description, company experience, and contact links.
 - `dist/styles.css`: responsive layout and typography.
-- `dist/cube.js`: perspective projection, pointer rotation, keyboard controls, and research stage selection. The cube is conceptual artwork, not experimental data.
-- `dist/assets/favicon.svg`: Cubic mark.
+- `dist/cube.js`: the decorative cube's perspective projection, automatic rotation, pause/resume, pointer rotation, and keyboard controls.
 
-Drag the cube to rotate, use arrow keys when focused, or press Home to reset. The research stage buttons and number keys 1–3 highlight different parts of the research trajectory. Touch gestures retain vertical page scrolling.
+Drag the cube, or use arrow keys when focused. Home resets orientation. Space toggles automatic rotation. The small motion control pauses or resumes rotation. Reduced-motion preferences disable automatic rotation by default. Animation stops when offscreen or in a hidden tab.
 
-Fonts: Instrument Serif and DM Sans from Google Fonts, with local fallbacks. Contact: namangatech@gmail.com. Founder affiliations describe prior experience.
+Fonts: Instrument Serif and DM Sans from Google Fonts, with local fallbacks. Contact: namangatech@gmail.com.
 
-Preserve the project ID in `.openai/hosting.json` when updating the deployment.
+Preserve the project ID in `.openai/hosting.json` for future deployments.

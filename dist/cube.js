@@ -1,77 +1,67 @@
 (() => {
-  const canvas = document.querySelector('#research-cube');
+  const canvas = document.querySelector('#brand-cube');
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-  const buttons = [...document.querySelectorAll('[data-stage]')];
-  const detail = document.querySelector('.stage-detail');
-  const descriptions = [
-    'Choosing which question is worth asking.',
-    'Designing tests and learning from failure.',
-    'Knowing what to pursue, revise, or leave behind.'
-  ];
-  const initial = { x: 0.38, y: -0.62 };
-  let rotation = { ...initial }, stage = 0, pointer = null;
-  const path = [[-1.08,-1.08,1.08],[0,-1.08,1.08],[0,0,1.08],[0,0,0],[1.08,0,0],[1.08,1.08,0]];
-  const faces = [[0,1,2,3],[4,7,6,5],[0,4,5,1],[3,2,6,7],[0,3,7,4],[1,5,6,2]];
-  let frame = 0;
-
+  const toggle = document.querySelector('.motion-toggle');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const initial = { x: 0.42, y: -0.62 };
+  let rotation = {...initial}, pointer = null, paused = reduced.matches;
+  let frame = 0, lastTime = 0, visible = true;
+  const tiles = [];
+  // Each face is a regular 3 × 3 surface. The cube is simply Cubic's mark in 3D.
+  for (let axis = 0; axis < 3; axis++) for (const side of [-1,1]) {
+    const normal = [0,0,0]; normal[axis] = side;
+    const axes = [0,1,2].filter(n => n !== axis);
+    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
+      const points = [[-.497,-.497],[.497,-.497],[.497,.497],[-.497,.497]].map(([u,v]) => {
+        const p = [0,0,0]; p[axis] = side * 1.5;
+        p[axes[0]] = i - 1 + u; p[axes[1]] = j - 1 + v;
+        return p;
+      });
+      tiles.push({points,normal});
+    }
+  }
   function rotate([x,y,z]) {
-    const a = x * Math.cos(rotation.y) + z * Math.sin(rotation.y);
-    const b = z * Math.cos(rotation.y) - x * Math.sin(rotation.y);
-    return [a, y * Math.cos(rotation.x) - b * Math.sin(rotation.x), y * Math.sin(rotation.x) + b * Math.cos(rotation.x)];
+    const a = x*Math.cos(rotation.y)+z*Math.sin(rotation.y);
+    const b = z*Math.cos(rotation.y)-x*Math.sin(rotation.y);
+    return [a,y*Math.cos(rotation.x)-b*Math.sin(rotation.x),y*Math.sin(rotation.x)+b*Math.cos(rotation.x)];
   }
   function project(v) {
-    const [x,y,z] = rotate(v), scale = 7 / (7 - z) * 53;
-    return [175 + x * scale, 153 - y * scale, z];
-  }
-  function stroke(points, color, width = 0.7) {
-    ctx.beginPath();
-    points.forEach((p,i) => { const q=project(p); i ? ctx.lineTo(q[0],q[1]) : ctx.moveTo(q[0],q[1]); });
-    ctx.strokeStyle=color; ctx.lineWidth=width; ctx.stroke();
-  }
-  function block(center, active) {
-    const d = 0.34;
-    const verts = [[-d,-d,-d],[d,-d,-d],[d,d,-d],[-d,d,-d],[-d,-d,d],[d,-d,d],[d,d,d],[-d,d,d]].map(v=>v.map((n,i)=>n+center[i]));
-    return faces.map((face,i)=>({
-      points:face.map(n=>project(verts[n])),
-      depth:face.reduce((sum,n)=>sum+project(verts[n])[2],0)/4,
-      color:active ? ['#36553b','#3e6241','#547347','#668452','#2d4c34','#799161'][i] : ['#c1cfa8','#cdd8b7','#dbe2cb','#b1c497','#bccda2','#e0e7d1'][i]
-    }));
+    const [x,y,z] = rotate(v), scale = 7/(7-z)*53;
+    return [175+x*scale,153-y*scale,z];
   }
   function draw() {
-    frame=0;
     ctx.clearRect(0,0,350,320);
-    const edges=[];
-    for (let a=0;a<4;a++) for(let b=0;b<4;b++) {
-      const u=-1.62+a*1.08, v=-1.62+b*1.08;
-      edges.push([[-1.62,u,v],[1.62,u,v]],[[u,-1.62,v],[u,1.62,v]],[[u,v,-1.62],[u,v,1.62]]);
-    }
-    edges.sort((a,b)=>(project(a[0])[2]+project(a[1])[2])-(project(b[0])[2]+project(b[1])[2]));
-    edges.forEach(e=>{
-      const depth=(project(e[0])[2]+project(e[1])[2])/2;
-      stroke(e,`rgba(100,126,78,${0.12+(depth+3.1)/6.2*0.25})`,0.65);
-    });
-    stroke(path,'#5d7950',1.7);
-    const polygons=path.flatMap((p,i)=>block(p,Math.floor(i/2)===stage));
-    polygons.sort((a,b)=>a.depth-b.depth);
-    for(const polygon of polygons){
-      ctx.beginPath();polygon.points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();
-      ctx.fillStyle=polygon.color;ctx.fill();ctx.strokeStyle='rgba(51,77,40,.65)';ctx.lineWidth=.65;ctx.stroke();
+    const faces = tiles.map(tile=>{
+      const normal=rotate(tile.normal), points=tile.points.map(project);
+      const light=.68+Math.max(0,-normal[0]*.35+normal[1]*.65+normal[2]*.45)*.4;
+      return {points,depth:points.reduce((s,p)=>s+p[2],0)/4,color:`rgb(${Math.round(151*light)},${Math.round(173*light)},${Math.round(124*light)})`};
+    }).sort((a,b)=>a.depth-b.depth);
+    for(const face of faces){
+      ctx.beginPath();face.points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();
+      ctx.fillStyle=face.color;ctx.fill();ctx.strokeStyle='rgba(61,86,43,.65)';ctx.lineWidth=.55;ctx.stroke();
     }
   }
-  function render() { if(!frame) frame=requestAnimationFrame(draw); }
-  function resize() {
+  function animate(time) {
+    frame=0;
+    if(!paused&&!pointer&&lastTime)rotation.y+=Math.min(time-lastTime,40)*.00013;
+    lastTime=time;draw();
+    if(!paused&&!pointer&&visible&&!document.hidden)frame=requestAnimationFrame(animate);
+  }
+  function render(){if(!frame)frame=requestAnimationFrame(animate);}
+  function setPaused(value){
+    paused=value;lastTime=0;
+    toggle.setAttribute('aria-pressed',String(paused));
+    toggle.setAttribute('aria-label',paused?'Resume cube animation':'Pause cube animation');
+    toggle.title=paused?'Resume animation':'Pause animation';
+    toggle.firstElementChild.textContent=paused?'▷':'Ⅱ';render();
+  }
+  function resize(){
     const dpr=Math.min(window.devicePixelRatio||1,2.5);
     canvas.width=Math.round(350*dpr);canvas.height=Math.round(320*dpr);
     ctx.setTransform(dpr,0,0,dpr,0,0);render();
   }
-  function selectStage(value) {
-    stage=value;
-    buttons.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===stage)));
-    detail.textContent=descriptions[stage];render();
-  }
-  buttons.forEach((button,i)=>button.addEventListener('click',()=>selectStage(i)));
-  document.querySelector('.reset').addEventListener('click',()=>{rotation={...initial};render();});
+  toggle.addEventListener('click',()=>setPaused(!paused));
   canvas.addEventListener('pointerdown',event=>{
     if(event.pointerType==='mouse'&&event.button!==0)return;
     pointer={id:event.pointerId,x:event.clientX,y:event.clientY};
@@ -83,20 +73,21 @@
     rotation.x=Math.max(-1.25,Math.min(1.25,rotation.x+(event.clientY-pointer.y)*.009));
     pointer.x=event.clientX;pointer.y=event.clientY;render();
   });
-  function release(){pointer=null;canvas.classList.remove('dragging');}
-  canvas.addEventListener('pointerup',release);
-  canvas.addEventListener('pointercancel',release);
-  canvas.addEventListener('lostpointercapture',release);
+  function release(){pointer=null;canvas.classList.remove('dragging');lastTime=0;render();}
+  ['pointerup','pointercancel','lostpointercapture'].forEach(name=>canvas.addEventListener(name,release));
   canvas.addEventListener('keydown',event=>{
-    if(['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','1','2','3'].includes(event.key))event.preventDefault();
-    else return;
+    if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home',' '].includes(event.key))return;
+    event.preventDefault();
+    if(event.key===' '){setPaused(!paused);return;}
+    setPaused(true);
     if(event.key==='ArrowLeft')rotation.y-=.14;
     if(event.key==='ArrowRight')rotation.y+=.14;
     if(event.key==='ArrowUp')rotation.x=Math.max(-1.25,rotation.x-.14);
     if(event.key==='ArrowDown')rotation.x=Math.min(1.25,rotation.x+.14);
-    if(event.key==='Home')rotation={...initial};
-    if(['1','2','3'].includes(event.key))selectStage(Number(event.key)-1);
-    render();
+    if(event.key==='Home')rotation={...initial};render();
   });
-  window.addEventListener('resize',resize);resize();
+  reduced.addEventListener('change',event=>setPaused(event.matches));
+  document.addEventListener('visibilitychange',()=>{lastTime=0;if(!document.hidden)render();});
+  new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;lastTime=0;if(visible)render();}).observe(canvas);
+  window.addEventListener('resize',resize);resize();setPaused(paused);
 })();
