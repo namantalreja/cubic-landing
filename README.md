@@ -1,22 +1,16 @@
-# Cubic Labs
+# Cubic
 
-A single-page, buildless website for Cubic Labs. HTML, CSS, and original SVG artwork; no JavaScript or package installation required.
+A compact single-page website for Cubic. Static HTML and CSS, with an interactive three-dimensional research cube rendered in Canvas. No dependencies or build step.
 
-## Preview
+Run `npm run dev`, then open http://localhost:4173. Python 3 is required for this development server. Any static host can serve `dist/` directly.
 
-Run `npm run dev` from this directory, then visit http://localhost:4173. Python 3 is required for the local server. Any static host can serve `dist/` directly.
+- `dist/index.html`: company description, founders, and contact links.
+- `dist/styles.css`: responsive layout and typography.
+- `dist/cube.js`: perspective projection, pointer rotation, keyboard controls, and research stage selection. The cube is conceptual artwork, not experimental data.
+- `dist/assets/favicon.svg`: Cubic mark.
 
-## Edit
+Drag the cube to rotate, use arrow keys when focused, or press Home to reset. The research stage buttons and number keys 1–3 highlight different parts of the research trajectory. Touch gestures retain vertical page scrolling.
 
-- `dist/index.html`: page copy and contact email.
-- `dist/styles.css`: typography, colors, layout, responsive styles, and reduced-motion support.
-- `dist/assets/research-space.svg`: original research trajectory illustration.
-- `dist/assets/favicon.svg`: original Cubic mark.
+Fonts: Instrument Serif and DM Sans from Google Fonts, with local fallbacks. Contact: namangatech@gmail.com. Founder affiliations describe prior experience.
 
-The page uses Instrument Serif, DM Sans, from Google Fonts, with local fallback fonts. Contact links open a draft to namangatech@gmail.com.
-
-The research graphic is a conceptual illustration, not experimental data.
-
-## Hosting
-
-`.openai/hosting.json` identifies the private Sites deployment and its static output directory. Preserve the project ID for future updates.
+Preserve the project ID in `.openai/hosting.json` when updating the deployment.

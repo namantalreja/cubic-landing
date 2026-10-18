@@ -4,30 +4,63 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f6f5ee">
-  <meta name="description" content="Cubic Labs turns real research trajectories into training and evaluation tasks for frontier AI.">
-  <meta property="og:title" content="Cubic Labs">
-  <meta property="og:description" content="Research trajectories for frontier AI.">
+  <meta name="description" content="Cubic partners with university research labs to turn real research trajectories into training and evaluation tasks for frontier AI.">
+  <meta property="og:title" content="Cubic — Research trajectories for frontier AI">
+  <meta property="og:description" content="Capturing the reasoning, intuition, and judgment behind scientific discovery.">
   <meta property="og:type" content="website">
-  <title>Cubic Labs</title>
+  <title>Cubic — Research trajectories for frontier AI</title>
   <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=Instrument+Serif&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+  <script src="cube.js" defer></script>
 </head>
 <body>
   <main>
     <header>
-      <svg class="mark" viewBox="0 0 36 40" aria-hidden="true"><path d="m18 2 16 9v18l-16 9L2 29V11Z M2 11l16 9 16-9M18 20v18 M10 6.5l16 9v18M26 6.5l-16 9v18M2 20l16 9 16-9"/></svg>
-      <h1>Cubic Labs</h1>
+      <a class="brand" href="./" aria-label="Cubic home"><svg class="mark" viewBox="0 0 36 40" aria-hidden="true"><path d="m18 2 16 9v18l-16 9L2 29V11Z M2 11l16 9 16-9M18 20v18 M10 6.5l16 9v18M26 6.5l-16 9v18M2 20l16 9 16-9"/></svg><span>Cubic</span></a>
+      <a class="header-contact" href="mailto:namangatech@gmail.com">Get in touch <span aria-hidden="true">↗</span></a>
     </header>
-    <div class="content">
-      <div class="copy">
-        <p>We partner with university labs to capture how research happens: forming hypotheses, designing experiments, navigating failures, and deciding what to try next. We turn these trajectories into training and evaluation tasks that help frontier AI develop scientific reasoning and judgment.</p>
-        <a class="contact" href="mailto:namangatech@gmail.com">Get in touch <span aria-hidden="true">↗</span></a>
-      </div>
-      <img class="graphic" src="assets/research-space.svg" width="300" height="278" alt="A research path through a cubic lattice.">
+
+    <div class="intro">
+      <section class="research" aria-labelledby="intro-title">
+        <h1 id="intro-title">Research trajectories<br>for frontier AI.</h1>
+        <p>We partner with university research labs to capture how research actually happens: forming hypotheses, designing experiments, navigating failures, and deciding what to pursue next.</p>
+        <p>Beyond code and results, we focus on the intuition, reasoning, communication, and judgment that shape the scientific process.</p>
+        <p>We turn these trajectories into challenging training and evaluation tasks, helping frontier models develop the scientific reasoning needed to navigate complex, open-ended problems.</p>
+      </section>
+
+      <figure class="cube-figure" aria-label="Explore the research process">
+        <div class="cube-wrap">
+          <canvas id="research-cube" width="700" height="640" tabindex="0" role="img" aria-label="Interactive 3D research cube. Drag or use arrow keys to rotate. Press 1, 2, or 3 to explore hypotheses, experiments, or decisions." aria-describedby="cube-help">A three-dimensional lattice showing a research trajectory. Explore the research stages using the buttons below.</canvas>
+          <button class="reset" type="button" aria-label="Reset cube rotation" title="Reset rotation">↺</button>
+        </div>
+        <figcaption>
+          <p class="cube-help" id="cube-help">Drag to rotate · arrow keys work too</p>
+          <div class="stages" role="group" aria-label="Research stages">
+            <button type="button" data-stage="0" aria-pressed="true">Hypotheses</button>
+            <button type="button" data-stage="1" aria-pressed="false">Experiments</button>
+            <button type="button" data-stage="2" aria-pressed="false">Decisions</button>
+          </div>
+          <p class="stage-detail" aria-live="polite">Choosing which question is worth asking.</p>
+        </figcaption>
+      </figure>
     </div>
+
+    <section class="team" aria-labelledby="team-title">
+      <h2 id="team-title">Team</h2>
+      <div class="founders">
+        <a href="https://www.namantalreja.com/" target="_blank" rel="noopener noreferrer"><span class="founder-name">Naman Talreja <span aria-hidden="true">↗</span></span><span class="experience">Cartesia, Amazon</span></a>
+        <a href="https://www.vishnukadaba.dev/" target="_blank" rel="noopener noreferrer"><span class="founder-name">Vishnu Kadaba <span aria-hidden="true">↗</span></span><span class="experience">Google, Lemma</span></a>
+        <a href="https://www.shubhayan.dev/" target="_blank" rel="noopener noreferrer"><span class="founder-name">Shubhayan Srivastava <span aria-hidden="true">↗</span></span><span class="experience">Ramp, Pogo</span></a>
+      </div>
+    </section>
+
+    <footer>
+      <p>If you’re a research lab or an AI team, we’d love to talk.</p>
+      <a href="mailto:namangatech@gmail.com">namangatech@gmail.com <span aria-hidden="true">↗</span></a>
+    </footer>
   </main>
 </body>
 </html>
