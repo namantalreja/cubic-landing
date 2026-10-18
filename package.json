@@ -6,5 +6,6 @@
   "scripts": {
     "dev": "python3 -m http.server 4173 --directory dist",
     "start": "python3 -m http.server 4173 --directory dist"
-  }
+  },
+  "type": "module"
 }
