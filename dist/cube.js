@@ -1,51 +1,61 @@
-(() => {
-  const canvas = document.querySelector('#brand-cube');
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  const toggle = document.querySelector('.motion-toggle');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const initial = { x: 0.42, y: -0.62 };
-  let rotation = {...initial}, pointer = null, paused = reduced.matches;
-  let frame = 0, lastTime = 0, visible = true;
-  const tiles = [];
-  // Each face is a regular 3 × 3 surface. The cube is simply Cubic's mark in 3D.
-  for (let axis = 0; axis < 3; axis++) for (const side of [-1,1]) {
-    const normal = [0,0,0]; normal[axis] = side;
-    const axes = [0,1,2].filter(n => n !== axis);
-    for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) {
-      const points = [[-.497,-.497],[.497,-.497],[.497,.497],[-.497,.497]].map(([u,v]) => {
-        const p = [0,0,0]; p[axis] = side * 1.5;
-        p[axes[0]] = i - 1 + u; p[axes[1]] = j - 1 + v;
-        return p;
-      });
-      tiles.push({points,normal});
-    }
-  }
-  function rotate([x,y,z]) {
-    const a = x*Math.cos(rotation.y)+z*Math.sin(rotation.y);
-    const b = z*Math.cos(rotation.y)-x*Math.sin(rotation.y);
-    return [a,y*Math.cos(rotation.x)-b*Math.sin(rotation.x),y*Math.sin(rotation.x)+b*Math.cos(rotation.x)];
-  }
-  function project(v) {
-    const [x,y,z] = rotate(v), scale = 7/(7-z)*53;
-    return [175+x*scale,153-y*scale,z];
-  }
-  function draw() {
-    ctx.clearRect(0,0,350,320);
-    const faces = tiles.map(tile=>{
-      const normal=rotate(tile.normal), points=tile.points.map(project);
-      const light=.68+Math.max(0,-normal[0]*.35+normal[1]*.65+normal[2]*.45)*.4;
-      return {points,depth:points.reduce((s,p)=>s+p[2],0)/4,color:`rgb(${Math.round(151*light)},${Math.round(173*light)},${Math.round(124*light)})`};
-    }).sort((a,b)=>a.depth-b.depth);
-    for(const face of faces){
-      ctx.beginPath();face.points.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.closePath();
-      ctx.fillStyle=face.color;ctx.fill();ctx.strokeStyle='rgba(61,86,43,.65)';ctx.lineWidth=.55;ctx.stroke();
-    }
-  }
-  function animate(time) {
+const canvas = document.querySelector('#brand-cube');
+try {
+  const [THREE, {RoundedBoxGeometry}, {RoomEnvironment}] = await Promise.all([
+    import('three'), import('./assets/vendor/RoundedBoxGeometry.js'), import('./assets/vendor/RoomEnvironment.js')
+  ]);
+  const renderer = new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'low-power'});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setClearColor(0xf6f5ee,0);
+  renderer.toneMapping=THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure=1.1;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(34,350/320,.1,50);
+  camera.position.set(0,.15,8.8);
+  camera.lookAt(0,-.12,0);
+  const room=new RoomEnvironment();
+  const pmrem=new THREE.PMREMGenerator(renderer);
+  const environment=pmrem.fromScene(room,.04);
+  scene.environment=environment.texture;
+  room.dispose();pmrem.dispose();
+  scene.add(new THREE.HemisphereLight(0xf9f9e9,0x53614b,1.2));
+  const key=new THREE.DirectionalLight(0xfff8e9,3);
+  key.position.set(-4,6,5);scene.add(key);
+  const fill=new THREE.DirectionalLight(0xd5e8ce,1.3);
+  fill.position.set(5,1,-3);scene.add(fill);
+
+  const sculpture=new THREE.Group();scene.add(sculpture);
+  const core=new THREE.Mesh(new RoundedBoxGeometry(1.16,1.16,1.16,5,.055),new THREE.MeshPhysicalMaterial({
+    color:0x42644c,metalness:.18,roughness:.25,clearcoat:.8,clearcoatRoughness:.18,envMapIntensity:1.2
+  }));
+  sculpture.add(core);
+  const shell=new THREE.Mesh(new RoundedBoxGeometry(2.52,2.52,2.52,6,.085),new THREE.MeshPhysicalMaterial({
+    color:0xb8cea6,metalness:0,roughness:.075,transmission:.94,thickness:.6,ior:1.45,
+    clearcoat:1,clearcoatRoughness:.08,envMapIntensity:1.3,
+    attenuationColor:new THREE.Color(0x8fae75),attenuationDistance:2.8
+  }));
+  sculpture.add(shell);
+
+  // A soft contact shadow gives the glass volume a little weight on the page.
+  const shadowCanvas=document.createElement('canvas');shadowCanvas.width=128;shadowCanvas.height=128;
+  const shadowCtx=shadowCanvas.getContext('2d');
+  const gradient=shadowCtx.createRadialGradient(64,64,4,64,64,64);
+  gradient.addColorStop(0,'rgba(41,63,37,.22)');gradient.addColorStop(.45,'rgba(41,63,37,.09)');gradient.addColorStop(1,'rgba(41,63,37,0)');
+  shadowCtx.fillStyle=gradient;shadowCtx.fillRect(0,0,128,128);
+  const shadow=new THREE.Mesh(new THREE.PlaneGeometry(3.9,1.1),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false}));
+  shadow.position.set(0,-2.15,-.4);scene.add(shadow);
+
+  const initial={x:.34,y:-.6,z:-.08};
+  let rotation={...initial},pointer=null,frame=0,lastTime=0,elapsed=0,visible=true;
+  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+  let paused=reduced.matches;
+  const toggle=document.querySelector('.motion-toggle');
+  function animate(time){
     frame=0;
-    if(!paused&&!pointer&&lastTime)rotation.y+=Math.min(time-lastTime,40)*.00013;
-    lastTime=time;draw();
+    const dt=lastTime?Math.min((time-lastTime)/1000,.05):0;lastTime=time;
+    if(!paused&&!pointer){elapsed+=dt;rotation.y+=dt*.15;}
+    sculpture.rotation.set(rotation.x,rotation.y,rotation.z);
+    sculpture.position.y=reduced.matches?0:Math.sin(elapsed*.65)*.065;
+    renderer.render(scene,camera);
     if(!paused&&!pointer&&visible&&!document.hidden)frame=requestAnimationFrame(animate);
   }
   function render(){if(!frame)frame=requestAnimationFrame(animate);}
@@ -57,15 +67,13 @@
     toggle.firstElementChild.textContent=paused?'▷':'Ⅱ';render();
   }
   function resize(){
-    const dpr=Math.min(window.devicePixelRatio||1,2.5);
-    canvas.width=Math.round(350*dpr);canvas.height=Math.round(320*dpr);
-    ctx.setTransform(dpr,0,0,dpr,0,0);render();
+    const width=canvas.clientWidth,height=width*320/350;
+    renderer.setSize(width,height,false);camera.aspect=width/height;camera.updateProjectionMatrix();render();
   }
   toggle.addEventListener('click',()=>setPaused(!paused));
   canvas.addEventListener('pointerdown',event=>{
     if(event.pointerType==='mouse'&&event.button!==0)return;
-    pointer={id:event.pointerId,x:event.clientX,y:event.clientY};
-    canvas.setPointerCapture(event.pointerId);canvas.classList.add('dragging');
+    pointer={id:event.pointerId,x:event.clientX,y:event.clientY};canvas.setPointerCapture(event.pointerId);canvas.classList.add('dragging');
   });
   canvas.addEventListener('pointermove',event=>{
     if(!pointer||pointer.id!==event.pointerId)return;
@@ -89,5 +97,13 @@
   reduced.addEventListener('change',event=>setPaused(event.matches));
   document.addEventListener('visibilitychange',()=>{lastTime=0;if(!document.hidden)render();});
   new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;lastTime=0;if(visible)render();}).observe(canvas);
-  window.addEventListener('resize',resize);resize();setPaused(paused);
-})();
+  canvas.addEventListener('webglcontextlost',event=>{event.preventDefault();if(frame)cancelAnimationFrame(frame);frame=0;});
+  canvas.addEventListener('webglcontextrestored',()=>{lastTime=0;render();});
+  window.addEventListener('resize',resize);
+  canvas.dataset.renderer='webgl';resize();setPaused(paused);
+} catch(error) {
+  // Preserve a visible, interactive cube on devices without WebGL.
+  const replacement=canvas.cloneNode(true);canvas.replaceWith(replacement);
+  replacement.dataset.renderer='canvas';
+  await import('./cube-fallback.js');
+}
