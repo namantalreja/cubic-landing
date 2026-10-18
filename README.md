@@ -1,20 +1,17 @@
 # Cubic
 
-A compact single-page site. Static HTML/CSS and a three-dimensional research trajectory. No installation or build step. Three.js 0.180.0 and its MIT license are bundled locally.
+A compact single-page site. Static HTML/CSS and an abstract research trajectory drawn on a canvas. No installation or build step.
 
 Run `npm run dev`, then open http://localhost:4173. Python 3 is required for the preview server. Any static host can serve `dist/`.
 
-- `dist/index.html`: one company paragraph, company experience, and contact links, laid out as a numbered single-scroll page with a sticky section index.
-- `dist/styles.css`: hairline grid frame, typography, and responsive rules.
-- `dist/site.js`: scroll reveals and the active-section index. Both respect reduced-motion preferences.
-- `dist/cube.js`: an orthographic cubic lattice with a fine brass trajectory, jade decision points, eased reveals, and a subtle moving glint. The lattice opens to expose a research route. The route explores a branch, backtracks, finds another direction, and reconnects as the cube closes.
+- `dist/index.html`: one company paragraph, company experience, and a contact button.
+- `dist/styles.css`: hairline frame, typography, and responsive rules.
+- `dist/trajectory.js`: a 2D canvas rendering of a cubic lattice with a research route drawn through it. The route explores a branch, backtracks, finds another direction, and reconnects as the lattice breathes.
 - `dist/cube-motion.js`: shared trajectory and animation timing.
-- `dist/cube-fallback.js`: Canvas renderer with the same trajectory for devices without WebGL.
-- `dist/assets/vendor/`: bundled Three.js modules and license.
 
-The sculpture represents research as a process of decisions, including unsuccessful directions. It is conceptual, not experimental data. There are no stages or explainer panels.
+The sketch represents research as a process of decisions, including unsuccessful directions. It is conceptual, not experimental data.
 
-Drag or use arrow keys to rotate. Home resets orientation. Space or the small motion button toggles animation. Reduced-motion preferences show the completed trajectory without animation. Offscreen and hidden tabs pause rendering.
+Drag or use arrow keys to rotate. Home resets orientation. Reduced-motion preferences show the completed trajectory without animation. Offscreen and hidden tabs pause rendering.
 
 Fonts: Newsreader, Inter Tight, and Geist Mono from Google Fonts. Contact: namangatech@gmail.com.
 
