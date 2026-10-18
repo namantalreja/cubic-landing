@@ -4,7 +4,9 @@ A compact single-page site. Static HTML/CSS and a three-dimensional research tra
 
 Run `npm run dev`, then open http://localhost:4173. Python 3 is required for the preview server. Any static host can serve `dist/`.
 
-- `dist/index.html`: one company paragraph, company experience, and contact links.
+- `dist/index.html`: one company paragraph, company experience, and contact links, laid out as a numbered single-scroll page with a sticky section index.
+- `dist/styles.css`: hairline grid frame, typography, and responsive rules.
+- `dist/site.js`: scroll reveals and the active-section index. Both respect reduced-motion preferences.
 - `dist/cube.js`: an orthographic cubic lattice with a fine brass trajectory, jade decision points, eased reveals, and a subtle moving glint. The lattice opens to expose a research route. The route explores a branch, backtracks, finds another direction, and reconnects as the cube closes.
 - `dist/cube-motion.js`: shared trajectory and animation timing.
 - `dist/cube-fallback.js`: Canvas renderer with the same trajectory for devices without WebGL.
@@ -14,6 +16,6 @@ The sculpture represents research as a process of decisions, including unsuccess
 
 Drag or use arrow keys to rotate. Home resets orientation. Space or the small motion button toggles animation. Reduced-motion preferences show the completed trajectory without animation. Offscreen and hidden tabs pause rendering.
 
-Fonts: Instrument Serif and DM Sans from Google Fonts. Contact: namangatech@gmail.com.
+Fonts: Newsreader, Inter Tight, and Geist Mono from Google Fonts. Contact: namangatech@gmail.com.
 
 Preserve the project ID in `.openai/hosting.json` for future deployments.
