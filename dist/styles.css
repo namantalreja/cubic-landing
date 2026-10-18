@@ -17,7 +17,7 @@ p{margin:0}
 .page{display:flex;flex-direction:column;width:min(1360px,100%);min-height:100vh;margin:0 auto;border-left:1px solid var(--rule);border-right:1px solid var(--rule)}
 header{display:flex;align-items:center;padding:30px var(--pad) 28px;border-bottom:1px solid var(--rule)}
 .brand{display:inline-flex;align-items:center;gap:11px;font-family:var(--sans);font-weight:300;font-size:20px;line-height:1;letter-spacing:.14em;text-transform:uppercase}
-.mark{width:18px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}
+.mark{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round}.mark .route{stroke-width:2}.mark .option{fill:currentColor;stroke:none;opacity:.45}.mark .head{fill:var(--accent);stroke:none}
 
 main{flex:1;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
 .intro{padding:48px 32px 48px var(--pad);display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--rule)}
