@@ -5,7 +5,7 @@ A compact single-page site. Static HTML/CSS and a three-dimensional research tra
 Run `npm run dev`, then open http://localhost:4173. Python 3 is required for the preview server. Any static host can serve `dist/`.
 
 - `dist/index.html`: one company paragraph, company experience, and contact links.
-- `dist/cube.js`: a prominent, translucent jade cube with a fine brass trajectory, smaller decision points, eased reveals, and a subtle moving glint. The fixed outer enclosure holds an expanding inner research lattice. The route explores a branch, backtracks, finds another direction, and reconnects as the inner lattice closes.
+- `dist/cube.js`: an orthographic cubic lattice with a fine brass trajectory, jade decision points, eased reveals, and a subtle moving glint. The lattice opens to expose a research route. The route explores a branch, backtracks, finds another direction, and reconnects as the cube closes.
 - `dist/cube-motion.js`: shared trajectory and animation timing.
 - `dist/cube-fallback.js`: Canvas renderer with the same trajectory for devices without WebGL.
 - `dist/assets/vendor/`: bundled Three.js modules and license.

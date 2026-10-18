@@ -9,7 +9,7 @@ try {
   renderer.toneMapping=THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure=1.05;
   const scene=new THREE.Scene();
-  const viewHeight=4.95;
+  const viewHeight=5.05;
   const camera=new THREE.OrthographicCamera(-viewHeight*350/320/2,viewHeight*350/320/2,viewHeight/2,-viewHeight/2,.1,50);
   camera.position.set(5,3.6,6.5);
   camera.lookAt(0,-.12,0);
@@ -27,26 +27,19 @@ try {
   const {route,branch,frameState}=await import('./cube-motion.js');
   const sculpture=new THREE.Group();scene.add(sculpture);
   const rodGeometry=new THREE.CylinderGeometry(1,1,1,10);
-  const beadGeometry=new THREE.SphereGeometry(.026,16,12);
-  const milestoneGeometry=new RoundedBoxGeometry(.145,.145,.145,5,.023);
-  const frameMaterial=new THREE.MeshStandardMaterial({color:0x507760,metalness:.3,roughness:.28,transparent:true,opacity:.94});
-  const gridMaterial=new THREE.MeshStandardMaterial({color:0x84977a,metalness:.2,roughness:.45,transparent:true,opacity:.14,depthWrite:false});
+  const beadGeometry=new THREE.SphereGeometry(.023,16,12);
+  const milestoneGeometry=new RoundedBoxGeometry(.175,.175,.175,5,.024);
+  const frameMaterial=new THREE.MeshStandardMaterial({color:0x506d58,metalness:.42,roughness:.32,transparent:true,opacity:.82});
+  const gridMaterial=new THREE.MeshStandardMaterial({color:0x84977a,metalness:.2,roughness:.45,transparent:true,opacity:.24});
   const nodeMaterial=new THREE.MeshStandardMaterial({color:0x607c5a,metalness:.35,roughness:.3});
   const routeMaterial=new THREE.MeshPhysicalMaterial({color:0x9f7934,metalness:.4,roughness:.28,clearcoat:.8,emissive:0x705023,emissiveIntensity:.08,transparent:true});
   const branchMaterial=new THREE.MeshStandardMaterial({color:0x9d8d65,metalness:.2,roughness:.5,transparent:true,opacity:.5});
   const milestoneMaterial=new THREE.MeshPhysicalMaterial({color:0x477456,metalness:.15,roughness:.3,clearcoat:.65,clearcoatRoughness:.2,transparent:true});
   const tipMaterial=new THREE.MeshPhysicalMaterial({color:0xc2ac68,metalness:.5,roughness:.2,clearcoat:.8,emissive:0x69511d,emissiveIntensity:.1,transparent:true});
   const lattice=[],beads=[],segments=[],failedSegments=[],milestones=[];
-  // A fixed, lightly tinted enclosure keeps the cube legible as the path unfolds inside.
-  const shell=new THREE.Mesh(new RoundedBoxGeometry(2.9,2.9,2.9,4,.035),new THREE.MeshPhysicalMaterial({
-    color:0xa7c0b1,metalness:.15,roughness:.27,clearcoat:1,clearcoatRoughness:.18,
-    transparent:true,opacity:.16,side:THREE.DoubleSide,depthWrite:false
-  }));
-  shell.renderOrder=1;sculpture.add(shell);
   const up=new THREE.Vector3(0,1,0);
   function rod(material,radius){const mesh=new THREE.Mesh(rodGeometry,material);mesh.userData.radius=radius;sculpture.add(mesh);return mesh;}
-  function point(index,spread){return new THREE.Vector3((index[0]-1.5)*.85,(index[1]-1.5)*.85*spread,(index[2]-1.5)*.85);}
-  function corner(index){return new THREE.Vector3(...index.map(v=>(v/3-.5)*2.9));}
+  function point(index,spread){return new THREE.Vector3((index[0]-1.5)*.9,(index[1]-1.5)*.9*spread,(index[2]-1.5)*.9);}
   function positionRod(mesh,a,b){
     const delta=new THREE.Vector3().subVectors(b,a),length=delta.length();
     mesh.visible=length>.001;if(!mesh.visible)return;
@@ -58,13 +51,13 @@ try {
     const others=[0,1,2].filter(v=>v!==axis),a=[0,0,0],b=[0,0,0];
     a[axis]=0;b[axis]=3;a[others[0]]=b[others[0]]=i;a[others[1]]=b[others[1]]=j;
     const outside=(i===0||i===3)&&(j===0||j===3);
-    lattice.push({a,b,outside,mesh:rod(outside?frameMaterial:gridMaterial,outside?.019:.0035)});
+    lattice.push({a,b,mesh:rod(outside?frameMaterial:gridMaterial,outside?.014:.0045)});
   }
   for(let x=0;x<4;x++)for(let y=0;y<4;y++)for(let z=0;z<4;z++){
     if(![x,y,z].every(v=>v===0||v===3))continue;
     const mesh=new THREE.Mesh(beadGeometry,nodeMaterial);sculpture.add(mesh);beads.push({index:[x,y,z],mesh});
   }
-  for(let i=0;i<route.length-1;i++)segments.push(rod(routeMaterial,.018));
+  for(let i=0;i<route.length-1;i++)segments.push(rod(routeMaterial,.023));
   for(let i=0;i<branch.length-1;i++)failedSegments.push(rod(branchMaterial,.012));
   route.forEach(index=>{const mesh=new THREE.Mesh(milestoneGeometry,milestoneMaterial);sculpture.add(mesh);milestones.push({index,mesh});});
   const tip=new THREE.Mesh(new THREE.SphereGeometry(.045,24,16),tipMaterial);sculpture.add(tip);
@@ -77,8 +70,8 @@ try {
   glint.scale.set(.28,.28,1);sculpture.add(glint);
   function updateStructure(time,still){
     const state=frameState(time,still),spread=state.spread;
-    for(const part of lattice)positionRod(part.mesh,part.outside?corner(part.a):point(part.a,spread),part.outside?corner(part.b):point(part.b,spread));
-    for(const bead of beads)bead.mesh.position.copy(corner(bead.index));
+    for(const part of lattice)positionRod(part.mesh,point(part.a,spread),point(part.b,spread));
+    for(const bead of beads)bead.mesh.position.copy(point(bead.index,spread));
     function trace(meshes,indices,progress){
       meshes.forEach((mesh,i)=>{
         const amount=Math.max(0,Math.min(1,progress-i));
@@ -101,7 +94,7 @@ try {
     canvas.dataset.cycle=state.branch>.1?'reconsidering':state.progress<8.9?'exploring':'connecting';
   }
 
-  // A diffuse shadow anchors the translucent cube.
+  // A diffuse shadow anchors the light wire structure.
   const shadowCanvas=document.createElement('canvas');shadowCanvas.width=128;shadowCanvas.height=128;
   const shadowCtx=shadowCanvas.getContext('2d');
   const gradient=shadowCtx.createRadialGradient(64,64,4,64,64,64);
