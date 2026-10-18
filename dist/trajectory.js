@@ -17,6 +17,33 @@ for (let axis = 0; axis < 3; axis++) for (let i = 0; i < 4; i++) for (let j = 0;
 const nodes = [];
 for (let x = 0; x < 4; x++) for (let y = 0; y < 4; y++) for (let z = 0; z < 4; z++) nodes.push([x, y, z]);
 
+// Paths the route could have taken: deterministic lattice walks from the same origin.
+const smooth = x => { const n = Math.max(0, Math.min(1, x)); return n * n * (3 - 2 * n); };
+function walks(count, steps, seed) {
+  let state = seed;
+  const random = () => { state = (state + 0x6d2b79f5) | 0; let t = Math.imul(state ^ (state >>> 15), 1 | state); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
+  const taken = new Set(route.map(String)), result = [];
+  for (let n = 0; n < count; n++) {
+    const path = [route[0]], seen = new Set([String(route[0])]);
+    let lastAxis = -1;
+    for (let i = 0; i < steps; i++) {
+      const current = path[path.length - 1], options = [];
+      for (let axis = 0; axis < 3; axis++) for (const dir of [-1, 1]) {
+        const next = current.slice(); next[axis] += dir;
+        if (next[axis] < 0 || next[axis] > 3 || seen.has(String(next))) continue;
+        options.push({next, weight: (axis === lastAxis ? 0.35 : 1) * (taken.has(String(next)) ? 0.4 : 1)});
+      }
+      if (!options.length) break;
+      let pick = random() * options.reduce((sum, o) => sum + o.weight, 0), choice = options[0];
+      for (const option of options) { pick -= option.weight; if (pick <= 0) { choice = option; break; } }
+      path.push(choice.next); seen.add(String(choice.next)); lastAxis = choice.next.findIndex((v, k) => v !== current[k]);
+    }
+    result.push(path);
+  }
+  return result;
+}
+const alternatives = walks(9, 9, 1123);
+
 function project(index, spread, yaw) {
   const x = (index[0] - 1.5) * 0.9, y = (index[1] - 1.5) * 0.9 * spread, z = (index[2] - 1.5) * 0.9;
   const a = x * Math.cos(yaw) + z * Math.sin(yaw), b = z * Math.cos(yaw) - x * Math.sin(yaw);
@@ -79,6 +106,18 @@ function draw() {
     ctx.fillStyle = color('--paper'); ctx.fillRect(p[0] - s / 2 - 1.5, p[1] - s / 2 - 1.5, s + 3, s + 3);
     ctx.fillStyle = ink; ctx.fillRect(p[0] - s / 2, p[1] - s / 2, s, s);
   });
+  const cycle = elapsed % 16, flash = still ? 0 : smooth((cycle - 11.55) / 0.3) * (1 - smooth((cycle - 12.7) / 1.9));
+  if (flash > 0.005) {
+    alternatives.forEach((walk, i) => {
+      const reach = Math.min(1, flash * 1.6 + i * 0.02), count = 1 + Math.floor((walk.length - 1) * reach);
+      const points = walk.slice(0, count + 1).map(index => project(index, spread, yaw));
+      ctx.globalAlpha = flash * (0.28 + (i % 3) * 0.1) * state.opacity;
+      stroke(points, i % 4 === 0 ? accent : ink, 0.9, [1.2, 3.6]);
+      const end = points[points.length - 1];
+      ctx.beginPath(); ctx.arc(end[0], end[1], 2.2, 0, Math.PI * 2); ctx.strokeStyle = i % 4 === 0 ? accent : ink; ctx.lineWidth = 0.8; ctx.stroke();
+    });
+    ctx.globalAlpha = state.opacity;
+  }
   const head = path[path.length - 1];
   const pulse = still ? 0 : (Math.sin(elapsed * 2.6) + 1) / 2;
   ctx.beginPath(); ctx.arc(head[0], head[1], 7 + pulse * 5, 0, Math.PI * 2);
