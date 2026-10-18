@@ -8,14 +8,14 @@ Run `npm run dev` from this directory, then visit http://localhost:4173. Python 
 
 ## Edit
 
-- `dist/index.html`: page copy, founder links, and contact email.
+- `dist/index.html`: page copy and contact email.
 - `dist/styles.css`: typography, colors, layout, responsive styles, and reduced-motion support.
 - `dist/assets/research-space.svg`: original research trajectory illustration.
 - `dist/assets/favicon.svg`: original Cubic mark.
 
-The page uses Instrument Serif, DM Sans, and IBM Plex Mono from Google Fonts, with local fallback fonts. Contact links open a draft to namangatech@gmail.com.
+The page uses Instrument Serif, DM Sans, from Google Fonts, with local fallback fonts. Contact links open a draft to namangatech@gmail.com.
 
-Founder affiliations are background information, not customer or partnership claims. The research graphic is a conceptual illustration, not experimental data.
+The research graphic is a conceptual illustration, not experimental data.
 
 ## Hosting
 
