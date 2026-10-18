@@ -130,9 +130,9 @@ function draw() {
 function tick(time) {
   frame = 0;
   const dt = last ? Math.min((time - last) / 1000, 0.05) : 0; last = time;
-  if (!pointer && !reduced.matches) elapsed += dt;
+  if (!reduced.matches) elapsed += dt;
   draw();
-  if (!pointer && !reduced.matches && visible && !document.hidden) frame = requestAnimationFrame(tick);
+  if (!reduced.matches && visible && !document.hidden) frame = requestAnimationFrame(tick);
 }
 function render() { if (!frame) frame = requestAnimationFrame(tick); }
 function resize() {

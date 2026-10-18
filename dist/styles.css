@@ -20,7 +20,7 @@ header{display:flex;align-items:center;padding:30px var(--pad) 28px;border-botto
 .mark{width:18px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}
 
 main{flex:1;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
-.intro{padding:88px var(--pad) 72px;display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--rule)}
+.intro{padding:48px var(--pad);display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--rule)}
 .intro>*{max-width:var(--measure)}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(38px,3.9vw,56px);line-height:1.08;letter-spacing:-.015em;margin:0 0 32px;font-variation-settings:"opsz" 72}
 .intro p{font-size:19px;line-height:1.6;color:var(--text)}
@@ -38,7 +38,7 @@ canvas.dragging{cursor:grabbing;touch-action:none}
 
 @media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
 
-@media(max-width:1100px){:root{--pad:32px}.intro{padding-top:64px;padding-bottom:56px}}
+@media(max-width:1100px){:root{--pad:32px}.intro{padding-top:40px;padding-bottom:40px}}
 
 @media(max-width:860px){
   :root{--pad:22px}
