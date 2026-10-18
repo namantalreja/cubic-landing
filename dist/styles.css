@@ -10,7 +10,7 @@ header{display:flex;justify-content:space-between;align-items:center}
 .mark{width:29px;height:33px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round}
 .header-contact{font-size:12px;border-bottom:1px solid #a1ad96;padding-bottom:5px;display:flex;gap:17px}
 .header-contact:hover,footer a:hover{border-color:var(--ink)}
-.intro{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:34px;margin-top:51px;align-items:center}
+.intro{display:grid;grid-template-columns:minmax(0,1fr) 405px;gap:34px;margin-top:51px;align-items:center}
 h1{font-family:var(--serif);font-size:42px;line-height:1.09;font-weight:400;letter-spacing:-.65px;margin:0 0 25px}
 p{margin:0;font-size:15px;line-height:1.85;color:var(--text)}
 .research p+p{margin-top:18px}
@@ -24,5 +24,5 @@ footer{margin-top:39px;border-top:1px solid var(--line);padding-top:22px;display
 footer p{font-size:12px;color:#7b8570}
 footer a{display:inline-flex;align-items:center;gap:14px;font-size:12px;border-bottom:1px solid #b6bfab;padding-bottom:3px}
 @media(min-width:1500px){main{margin-top:120px}}
-@media(max-width:800px) and (min-width:641px){main{padding:0 32px}.intro{grid-template-columns:minmax(0,1fr) 250px;gap:26px}h1{font-size:37px}p{font-size:14px}footer{align-items:flex-start;flex-direction:column;gap:12px}}
-@media(max-width:640px){main{margin:43px auto 35px;padding:0 27px}.brand{font-size:42px}.mark{width:26px;height:30px}.header-contact{font-size:11px;gap:10px}.intro{grid-template-columns:1fr;gap:18px;margin-top:40px}h1{font-size:40px;margin-bottom:23px}p{font-size:14px;line-height:1.85}.research p+p{margin-top:17px}.cube-figure{width:265px;max-width:100%;justify-self:center}footer{margin-top:24px;padding-top:20px;flex-direction:column;align-items:flex-start;gap:12px}footer p{font-size:11px}footer a{font-size:12px}}
+@media(max-width:900px) and (min-width:641px){main{padding:0 32px}.intro{grid-template-columns:minmax(0,1fr) minmax(265px,.95fr);gap:26px}h1{font-size:37px}p{font-size:14px}footer{align-items:flex-start;flex-direction:column;gap:12px}}
+@media(max-width:640px){main{margin:43px auto 35px;padding:0 27px}.brand{font-size:42px}.mark{width:26px;height:30px}.header-contact{font-size:11px;gap:10px}.intro{grid-template-columns:1fr;gap:18px;margin-top:40px}h1{font-size:40px;margin-bottom:23px}p{font-size:14px;line-height:1.85}.research p+p{margin-top:17px}.cube-figure{width:320px;max-width:100%;justify-self:center}footer{margin-top:24px;padding-top:20px;flex-direction:column;align-items:flex-start;gap:12px}footer p{font-size:11px}footer a{font-size:12px}}
