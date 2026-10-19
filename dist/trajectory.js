@@ -63,18 +63,20 @@ function draw() {
   const yaw = rotation.y + (still ? 0 : Math.sin(elapsed * 0.22) * 0.1);
   const ink = color('--ink'), faint = color('--faint'), rule = color('--rule'), accent = color('--accent');
   ctx.clearRect(0, 0, size, size);
+  const cycle = elapsed % 17, flash = still ? 0 : smooth((cycle - 11.55) / 0.3) * (1 - smooth((cycle - 13.7) / 1.9));
+  const dim = 1 - flash * 0.82;
 
   for (const part of lattice) {
     const p = project(part.a, spread, yaw), q = project(part.b, spread, yaw);
     const depth = (p[2] + q[2]) / 2;
     const alpha = part.outside ? 0.55 + depth * 0.08 : 0.16 + depth * 0.04;
-    ctx.globalAlpha = Math.max(0.05, Math.min(1, alpha));
+    ctx.globalAlpha = Math.max(0.05, Math.min(1, alpha)) * dim;
     stroke([p, q], part.outside ? ink : faint, part.outside ? 0.9 : 0.6);
   }
   ctx.globalAlpha = 1;
   for (const node of nodes) {
     const p = project(node, spread, yaw);
-    ctx.fillStyle = rule; ctx.globalAlpha = 0.9;
+    ctx.fillStyle = rule; ctx.globalAlpha = 0.9 * dim;
     ctx.fillRect(p[0] - 0.9, p[1] - 0.9, 1.8, 1.8);
   }
   ctx.globalAlpha = 1;
@@ -106,7 +108,6 @@ function draw() {
     ctx.fillStyle = color('--paper'); ctx.fillRect(p[0] - s / 2 - 1.5, p[1] - s / 2 - 1.5, s + 3, s + 3);
     ctx.fillStyle = ink; ctx.fillRect(p[0] - s / 2, p[1] - s / 2, s, s);
   });
-  const cycle = elapsed % 16, flash = still ? 0 : smooth((cycle - 11.55) / 0.3) * (1 - smooth((cycle - 12.7) / 1.9));
   if (flash > 0.005) {
     alternatives.forEach((walk, i) => {
       const reach = Math.min(1, flash * 1.6 + i * 0.02), count = 1 + Math.floor((walk.length - 1) * reach);
