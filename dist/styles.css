@@ -20,7 +20,7 @@ header{display:flex;align-items:center;padding:30px var(--pad) 28px;border-botto
 .mark{width:18px;height:20px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linejoin:round}
 
 main{flex:1;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr)}
-.intro{padding:48px 32px 48px var(--pad);display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--rule)}
+.intro{padding:48px 32px 48px var(--pad);display:flex;flex-direction:column;justify-content:center}
 .intro>*{max-width:var(--measure)}
 h1{font-family:var(--serif);font-weight:400;font-size:clamp(38px,3.9vw,56px);line-height:1.08;letter-spacing:-.015em;margin:0 0 32px;font-variation-settings:"opsz" 72}
 .intro p{font-size:19px;line-height:1.6;color:var(--text)}
@@ -46,7 +46,7 @@ canvas.dragging{cursor:grabbing;touch-action:none}
   header{padding:18px var(--pad) 16px}
   .brand{font-size:17px}
   main{grid-template-columns:1fr}
-  .intro{order:2;border-right:0;border-top:1px solid var(--rule);padding:44px var(--pad) 64px}
+  .intro{order:2;border-top:1px solid var(--rule);padding:44px var(--pad) 64px}
   .intro>*{max-width:none}
   h1{font-size:clamp(34px,8.6vw,44px);margin-bottom:24px}
   .intro p{font-size:17px}
